@@ -79,10 +79,11 @@
   .polaroid .frame img{ width:100%; display:block; object-fit:cover; }
 
   .page-photo{
-    position:absolute; width:clamp(105px, 15vw, 190px); padding:7px 7px 11px;
-    background:#e8e8e8; box-shadow:0 12px 28px rgba(0,0,0,.65); z-index:2;
+    position:absolute; width:clamp(90px, 13vw, 165px); padding:0;
+    background:transparent; box-shadow:none; z-index:0; pointer-events:none;
   }
-  .page-photo img{ display:block; width:100%; height:auto; }
+  .page-photo img{ display:block; width:100%; height:auto; background:transparent; }
+  .page-photo-4 img{ mix-blend-mode:screen; }
   .page-photo:nth-of-type(odd){ left:clamp(8px, 2.5vw, 42px); transform:rotate(-6deg); }
   .page-photo:nth-of-type(even){ right:clamp(8px, 2.5vw, 42px); transform:rotate(6deg); }
   .page-photo-1{ top:14%; }
