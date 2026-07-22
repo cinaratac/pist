@@ -132,6 +132,32 @@
   .acrostic p:nth-child(odd){ --tilt:-.5deg; }
   .acrostic p:nth-child(even){ --tilt:.5deg; padding-left:18px; }
 
+  /* MÜZİK KARTI VE PLAK */
+  #music-player{ padding-top:55px; padding-bottom:90px; text-align:center; overflow:hidden; }
+  .music-player{
+    --player-size:min(58vw, 430px);
+    position:relative; display:inline-block; height:var(--player-size);
+    width:calc(var(--player-size) * 1.64); border:0; padding:0; background:none;
+    cursor:pointer; isolation:isolate;
+  }
+  .music-card{
+    position:absolute; z-index:2; left:0; top:0; height:var(--player-size); width:auto;
+    border-radius:18px; box-shadow:0 18px 45px rgba(0,0,0,.6); display:block;
+  }
+  .record-disc{
+    position:absolute; z-index:1; left:calc(var(--player-size) * .64); top:0;
+    width:var(--player-size); height:var(--player-size); border-radius:50%; overflow:hidden;
+    filter:drop-shadow(10px 15px 22px rgba(0,0,0,.75));
+  }
+  .record-disc img{
+    position:absolute; width:100%; height:auto; left:0; top:50%;
+    transform:translateY(-50%) rotate(0deg); transform-origin:50% 50%; display:block;
+  }
+  .music-player.is-spinning .record-disc img{ animation:recordSpin 2.8s linear infinite; }
+  @keyframes recordSpin{ to{ transform:translateY(-50%) rotate(360deg); } }
+  .music-player:focus-visible{ outline:3px solid #d8dadd; outline-offset:10px; border-radius:18px; }
+  .player-hint{ margin-top:18px; color:#8f9297; font-family:'Caveat', cursive; font-size:21px; }
+
   @media (max-width:600px){
     .board{ grid-template-columns:repeat(3,1fr); }
     .moments{ gap:76px; }
@@ -141,6 +167,7 @@
     .note::before{ top:-34px; }
     .note::after{ top:-45px; }
     .page-photo{ width:88px; opacity:.92; }
+    .music-player{ --player-size:min(53vw, 330px); }
   }
 
   /* FINAL / MAIN CTA */
@@ -217,6 +244,14 @@
     <p>Ukalalık yapmam bidaha raylar soldan akar</p>
     <p>Keşke seni biraz daha öpseydim canım çekti şimdi yar</p>
   </div>
+</section>
+
+<section id="music-player">
+  <button class="music-player" type="button" aria-label="Plağı döndür" aria-pressed="false" onclick="toggleRecord(this)">
+    <span class="record-disc" aria-hidden="true"><img src="plak.png" alt=""></span>
+    <img class="music-card" src="music.jpeg" alt="The Beach — The Neighbourhood; If I told you that I loved you, tell me, what would you say?">
+  </button>
+  <p class="player-hint">plağa dokun</p>
 </section>
 
 <section id="final">
@@ -310,6 +345,12 @@ function flipCard(c){
       },800);
     }
   }
+}
+
+// ---- PLAK ANİMASYONU ----
+function toggleRecord(player){
+  const isSpinning = player.classList.toggle('is-spinning');
+  player.setAttribute('aria-pressed', String(isSpinning));
 }
 
 // ---- KUTLAMA EFEKTİ ----
