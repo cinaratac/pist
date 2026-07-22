@@ -36,8 +36,14 @@
 
   #side-stars{ position:absolute; top:0; left:0; width:100%; z-index:0; pointer-events:none; }
   .side-star{ position:absolute; color:var(--gold); animation: twinkle 4s ease-in-out infinite; }
+  #star-chain{ position:absolute; inset:0 0 auto; z-index:0; pointer-events:none; overflow:hidden; opacity:.16; }
+  .chain-link{
+    position:absolute; width:15px; height:29px; border:2px solid #c7c9cc; border-radius:50%;
+    box-shadow:0 0 5px rgba(255,255,255,.35), inset 0 0 3px rgba(255,255,255,.25);
+    transform:translate(-50%,-50%) rotate(var(--link-angle));
+  }
 
-  section{ position:relative; z-index:1; padding: 90px 20px; max-width:820px; margin:0 auto; }
+  section{ position:relative; z-index:2; padding:90px 20px; max-width:820px; margin:0 auto; }
   h1,h2{ font-family:'Caveat', cursive; font-weight:700; }
 
   /* HERO */
@@ -80,16 +86,14 @@
 
   .page-photo{
     position:absolute; width:clamp(90px, 13vw, 165px); padding:0;
-    background:transparent; box-shadow:none; z-index:0; pointer-events:none;
+    background:transparent; box-shadow:none; z-index:1; pointer-events:none;
   }
   .page-photo img{ display:block; width:100%; height:auto; background:transparent; }
   .page-photo-4 img{ mix-blend-mode:screen; }
-  .page-photo:nth-of-type(odd){ left:clamp(8px, 2.5vw, 42px); transform:rotate(-6deg); }
-  .page-photo:nth-of-type(even){ right:clamp(8px, 2.5vw, 42px); transform:rotate(6deg); }
-  .page-photo-1{ top:14%; }
-  .page-photo-2{ top:37%; }
-  .page-photo-3{ top:61%; }
-  .page-photo-4{ top:82%; }
+  .page-photo-1{ top:8%; left:clamp(8px,2.5vw,42px); transform:rotate(-6deg); }
+  .page-photo-2{ top:43%; right:clamp(8px,2.5vw,42px); transform:rotate(6deg); }
+  .page-photo-3{ top:61%; right:clamp(8px,2.5vw,42px); transform:rotate(-5deg); }
+  .page-photo-4{ top:82%; left:clamp(8px,2.5vw,42px); transform:rotate(5deg); }
 
   .note{
     position:absolute; top:42%; width:145px; padding:0; font-family:'Caveat', cursive;
@@ -133,7 +137,7 @@
   .acrostic p:nth-child(even){ --tilt:.5deg; padding-left:18px; }
 
   /* MÜZİK KARTI VE PLAK */
-  #music-player{ padding-top:55px; padding-bottom:90px; text-align:center; overflow:visible; }
+  #music-player{ padding-top:55px; padding-bottom:20px; text-align:center; overflow:visible; }
   .music-player{
     --player-size:min(58vw, 430px);
     position:relative; display:inline-block; height:var(--player-size);
@@ -182,7 +186,7 @@
   .player-hint{ margin-top:18px; color:#8f9297; font-family:'Caveat', cursive; font-size:21px; }
 
   /* ZARF VE VİDEO */
-  #letter-video{ padding-top:70px; padding-bottom:110px; }
+  #letter-video{ padding-top:20px; padding-bottom:110px; }
   .letter-video-wrap{ display:flex; align-items:flex-end; justify-content:center; gap:clamp(28px,6vw,70px); }
   .envelope-area{ text-align:center; }
   .envelope{
@@ -257,13 +261,14 @@
 
 <div id="stars"></div>
 <div id="side-stars"></div>
+<div id="star-chain" aria-hidden="true"></div>
 <div class="page-photo page-photo-1"><img src="side-photo-1.png" alt=""></div>
 <div class="page-photo page-photo-2"><img src="side-photo-2.png" alt=""></div>
 <div class="page-photo page-photo-3"><img src="side-photo-3.png" alt=""></div>
 <div class="page-photo page-photo-4"><img src="side-photo-4.png" alt=""></div>
 
 <section id="hero">
-  <div class="star-wrap"><button class="silver-star" type="button" onclick="loveBurst()" aria-label="Yıldızları göster"></button></div>
+  <div class="star-wrap"><button class="silver-star" id="top-star" type="button" onclick="loveBurst()" aria-label="Yıldızları göster"></button></div>
   <h1>PIST</h1>
   <p class="sub">Slm nbr</p>
 </section>
@@ -340,10 +345,11 @@
     </div>
     <video class="side-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-label="Hareketli anı"></video>
   </div>
+  <audio id="envelope-audio" src="ham.mp3" preload="metadata"></audio>
 </section>
 
 <section id="final">
-  <button class="silver-star" type="button" onclick="loveBurst()" aria-label="Yıldızları göster"></button>
+  <button class="silver-star" id="bottom-star" type="button" onclick="loveBurst()" aria-label="Yıldızları göster"></button>
 </section>
 
 <footer>ok bb</footer>
@@ -384,6 +390,41 @@ function scatterSideStars(){
 }
 window.addEventListener('load', scatterSideStars);
 window.addEventListener('resize', scatterSideStars);
+
+// En üst ve en alt yıldızı arkadan birbirine bağlayan zincir
+function drawStarChain(){
+  const chain = document.getElementById('star-chain');
+  const topStar = document.getElementById('top-star');
+  const bottomStar = document.getElementById('bottom-star');
+  if(!chain || !topStar || !bottomStar) return;
+
+  const topBox = topStar.getBoundingClientRect();
+  const bottomBox = bottomStar.getBoundingClientRect();
+  const startX = topBox.left + topBox.width / 2;
+  const startY = topBox.top + window.scrollY + topBox.height / 2;
+  const endX = bottomBox.left + bottomBox.width / 2;
+  const endY = bottomBox.top + window.scrollY + bottomBox.height / 2;
+  const distance = Math.max(0, endY - startY);
+  const gap = 22;
+  const linkCount = Math.floor(distance / gap);
+
+  chain.style.height = document.body.scrollHeight + 'px';
+  chain.replaceChildren();
+  for(let i=0;i<=linkCount;i++){
+    const progress = linkCount ? i / linkCount : 0;
+    const link = document.createElement('span');
+    link.className = 'chain-link';
+    link.style.left = (startX + (endX-startX)*progress) + 'px';
+    link.style.top = (startY + distance*progress) + 'px';
+    link.style.setProperty('--link-angle', i%2 ? '90deg' : '0deg');
+    chain.appendChild(link);
+  }
+}
+
+window.addEventListener('load', drawStarChain);
+window.addEventListener('resize', drawStarChain);
+document.querySelector('.side-video')?.addEventListener('loadedmetadata', drawStarChain);
+document.fonts?.ready.then(drawStarChain);
 
 // ---- HAFIZA OYUNU (sadece burada inside joke'lar var) ----
 const jokes = ["tamam bişey demedim","ikizler işte","bakarız","pıst"];
@@ -442,6 +483,11 @@ function toggleEnvelope(envelope){
   envelope.setAttribute('aria-label', isOpen ? 'Zarfı kapat' : 'Zarfı aç');
   const hint = envelope.parentElement.querySelector('.envelope-hint');
   hint.textContent = isOpen ? 'bir daha basarsan kapanır' : 'zarfı aç';
+  if(isOpen){
+    const envelopeAudio = document.getElementById('envelope-audio');
+    envelopeAudio.currentTime = 0;
+    envelopeAudio.play().catch(()=>{});
+  }
 }
 
 // ---- PLAK ANİMASYONU ----
