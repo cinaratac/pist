@@ -181,6 +181,46 @@
   .music-player:focus-visible{ outline:3px solid #d8dadd; outline-offset:10px; border-radius:18px; }
   .player-hint{ margin-top:18px; color:#8f9297; font-family:'Caveat', cursive; font-size:21px; }
 
+  /* ZARF VE VİDEO */
+  #letter-video{ padding-top:70px; padding-bottom:110px; }
+  .letter-video-wrap{ display:flex; align-items:flex-end; justify-content:center; gap:clamp(28px,6vw,70px); }
+  .envelope-area{ text-align:center; }
+  .envelope{
+    position:relative; width:280px; height:345px; border:0; padding:0; background:none;
+    cursor:pointer; overflow:visible; perspective:900px;
+  }
+  .envelope-back{
+    position:absolute; z-index:0; left:0; bottom:0; width:100%; height:180px;
+    background:#101010; border:2px solid #5e6064; border-radius:5px;
+    box-shadow:0 18px 38px rgba(0,0,0,.65), inset 0 0 30px rgba(255,255,255,.025);
+  }
+  .kiss-photo{
+    position:absolute; z-index:1; left:50%; bottom:18px; width:185px; height:245px;
+    object-fit:cover; padding:7px 7px 22px; background:#e7e7e7;
+    box-shadow:0 7px 22px rgba(0,0,0,.65); transform:translateX(-50%) translateY(105px) rotate(-2deg);
+    transition:transform 1s cubic-bezier(.2,.75,.2,1); pointer-events:none;
+  }
+  .envelope-front{
+    position:absolute; z-index:3; left:0; bottom:0; width:100%; height:180px;
+    background:linear-gradient(145deg,#181818,#050505); border:2px solid #5e6064;
+    clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%);
+  }
+  .envelope-flap{
+    position:absolute; z-index:4; left:0; bottom:88px; width:100%; height:92px;
+    background:linear-gradient(180deg,#242424,#090909); border:2px solid #6d7075;
+    clip-path:polygon(0 0,100% 0,50% 100%); transform-origin:top center;
+    transition:transform .7s ease, z-index 0s .35s;
+  }
+  .envelope.open .envelope-flap{ transform:rotateX(180deg); z-index:0; transition:transform .7s ease, z-index 0s .2s; }
+  .envelope.open .kiss-photo{ transform:translateX(-50%) translateY(-95px) rotate(2deg); }
+  .envelope:focus-visible{ outline:3px solid #d8dadd; outline-offset:7px; border-radius:6px; }
+  .envelope-hint{ margin-top:10px; color:#aaa; font-family:'Caveat', cursive; font-size:21px; }
+  .side-video{
+    width:min(310px,40vw); max-height:430px; display:block; object-fit:contain;
+    border-radius:10px; background:#050505; border:1px solid #55585d;
+    box-shadow:0 18px 42px rgba(0,0,0,.7);
+  }
+
   @media (max-width:600px){
     .board{ grid-template-columns:repeat(3,1fr); }
     .moments{ gap:76px; }
@@ -191,6 +231,12 @@
     .note::after{ top:-45px; }
     .page-photo{ width:88px; opacity:.92; }
     .music-player{ --player-size:min(53vw, 330px); }
+    .letter-video-wrap{ flex-direction:column; align-items:center; gap:45px; }
+    .envelope{ width:250px; height:320px; }
+    .envelope-back,.envelope-front{ height:160px; }
+    .envelope-flap{ bottom:78px; height:82px; }
+    .kiss-photo{ width:165px; height:220px; }
+    .side-video{ width:min(88vw,330px); max-height:520px; }
   }
 
   /* FINAL / MAIN CTA */
@@ -276,6 +322,21 @@
   </button>
   <p class="player-hint">plağa dokun</p>
   <audio id="record-audio" src="the-beach.mp3" preload="metadata"></audio>
+</section>
+
+<section id="letter-video">
+  <div class="letter-video-wrap">
+    <div class="envelope-area">
+      <button class="envelope" type="button" aria-label="Zarfı aç" aria-expanded="false" onclick="toggleEnvelope(this)">
+        <span class="envelope-back" aria-hidden="true"></span>
+        <img class="kiss-photo" src="kiss.jpeg" alt="Zarfın içindeki fotoğraf">
+        <span class="envelope-flap" aria-hidden="true"></span>
+        <span class="envelope-front" aria-hidden="true"></span>
+      </button>
+      <p class="envelope-hint">zarfı aç</p>
+    </div>
+    <video class="side-video" src="video.mp4" controls playsinline preload="metadata">Tarayıcın videoyu desteklemiyor.</video>
+  </div>
 </section>
 
 <section id="final">
@@ -369,6 +430,15 @@ function flipCard(c){
       },800);
     }
   }
+}
+
+// ---- ZARF ----
+function toggleEnvelope(envelope){
+  const isOpen = envelope.classList.toggle('open');
+  envelope.setAttribute('aria-expanded', String(isOpen));
+  envelope.setAttribute('aria-label', isOpen ? 'Zarfı kapat' : 'Zarfı aç');
+  const hint = envelope.parentElement.querySelector('.envelope-hint');
+  hint.textContent = isOpen ? 'bir daha basarsan kapanır' : 'zarfı aç';
 }
 
 // ---- PLAK ANİMASYONU ----
