@@ -133,7 +133,7 @@
   .acrostic p:nth-child(even){ --tilt:.5deg; padding-left:18px; }
 
   /* MÜZİK KARTI VE PLAK */
-  #music-player{ padding-top:55px; padding-bottom:90px; text-align:center; overflow:hidden; }
+  #music-player{ padding-top:55px; padding-bottom:90px; text-align:center; overflow:visible; }
   .music-player{
     --player-size:min(58vw, 430px);
     position:relative; display:inline-block; height:var(--player-size);
@@ -155,6 +155,29 @@
   }
   .music-player.is-spinning .record-disc img{ animation:recordSpin 2.8s linear infinite; }
   @keyframes recordSpin{ to{ transform:translateY(-50%) rotate(360deg); } }
+  .peki-drop{
+    position:absolute; z-index:0; left:18%; top:48%; margin:0; color:#fff;
+    font-family:'Quicksand', sans-serif; font-size:clamp(38px,7vw,76px); font-weight:700;
+    letter-spacing:.12em; pointer-events:none; white-space:nowrap;
+    animation:pekiFall 2.8s cubic-bezier(.35,.02,.65,1) forwards;
+  }
+  @keyframes pekiFall{
+    0%{ transform:translate(-50%,-50%) scale(.7); opacity:0; }
+    14%{ opacity:1; }
+    38%{ transform:translate(-50%,75%) scale(1); opacity:1; }
+    100%{ transform:translate(-50%,105vh) scale(1.08); opacity:0; }
+  }
+  .record-star{
+    position:fixed; z-index:20; left:0; top:0; color:#f4f4f4; pointer-events:none;
+    font-size:var(--star-size); line-height:1; text-shadow:0 0 12px #fff;
+    animation:starExplosion 1.25s cubic-bezier(.12,.72,.2,1) forwards;
+  }
+  @keyframes starExplosion{
+    0%{ transform:translate(-50%,-50%) scale(.05) rotate(0deg); opacity:0; }
+    18%{ opacity:1; }
+    72%{ opacity:1; }
+    100%{ transform:translate(calc(-50% + var(--burst-x)),calc(-50% + var(--burst-y))) scale(2.8) rotate(var(--spin)); opacity:0; }
+  }
   .music-player:focus-visible{ outline:3px solid #d8dadd; outline-offset:10px; border-radius:18px; }
   .player-hint{ margin-top:18px; color:#8f9297; font-family:'Caveat', cursive; font-size:21px; }
 
@@ -247,11 +270,12 @@
 </section>
 
 <section id="music-player">
-  <button class="music-player" type="button" aria-label="Plağı döndür" aria-pressed="false" onclick="toggleRecord(this)">
+  <button class="music-player" type="button" aria-label="Müziği çal ve plağı döndür" aria-pressed="false" onclick="toggleRecord(this, event)">
     <span class="record-disc" aria-hidden="true"><img src="plak.png" alt=""></span>
     <img class="music-card" src="music.jpeg" alt="The Beach — The Neighbourhood; If I told you that I loved you, tell me, what would you say?">
   </button>
   <p class="player-hint">plağa dokun</p>
+  <audio id="record-audio" src="the-beach.mp3" preload="metadata"></audio>
 </section>
 
 <section id="final">
@@ -348,9 +372,57 @@ function flipCard(c){
 }
 
 // ---- PLAK ANİMASYONU ----
-function toggleRecord(player){
-  const isSpinning = player.classList.toggle('is-spinning');
-  player.setAttribute('aria-pressed', String(isSpinning));
+const recordAudio = document.getElementById('record-audio');
+
+recordAudio.addEventListener('ended', ()=>{
+  const player = document.querySelector('.music-player');
+  player.classList.remove('is-spinning');
+  player.setAttribute('aria-pressed', 'false');
+});
+
+function toggleRecord(player, event){
+  const shouldPlay = recordAudio.paused;
+  if(shouldPlay){
+    recordAudio.play().then(()=>{
+      player.classList.add('is-spinning');
+      player.setAttribute('aria-pressed', 'true');
+    }).catch(()=>{
+      player.classList.remove('is-spinning');
+      player.setAttribute('aria-pressed', 'false');
+    });
+  } else {
+    recordAudio.pause();
+    player.classList.remove('is-spinning');
+    player.setAttribute('aria-pressed', 'false');
+  }
+
+  const peki = document.createElement('span');
+  peki.className = 'peki-drop';
+  peki.textContent = 'PEKİ';
+  player.appendChild(peki);
+  setTimeout(()=>peki.remove(), 2900);
+
+  const rect = player.getBoundingClientRect();
+  const originX = event.detail ? event.clientX : rect.left + rect.width / 2;
+  const originY = event.detail ? event.clientY : rect.top + rect.height / 2;
+  const maxRadius = Math.hypot(window.innerWidth, window.innerHeight) * .65;
+  const symbols = ['★','✦','☆','✧'];
+  for(let i=0;i<52;i++){
+    const star = document.createElement('span');
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 100 + Math.random() * maxRadius;
+    star.className = 'record-star';
+    star.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    star.style.left = originX + 'px';
+    star.style.top = originY + 'px';
+    star.style.setProperty('--burst-x', Math.cos(angle) * radius + 'px');
+    star.style.setProperty('--burst-y', Math.sin(angle) * radius + 'px');
+    star.style.setProperty('--spin', (Math.random()*540-270) + 'deg');
+    star.style.setProperty('--star-size', (10+Math.random()*22) + 'px');
+    star.style.animationDelay = Math.random()*.16 + 's';
+    document.body.appendChild(star);
+    setTimeout(()=>star.remove(), 1500);
+  }
 }
 
 // ---- KUTLAMA EFEKTİ ----
