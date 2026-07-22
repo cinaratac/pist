@@ -159,7 +159,7 @@
     position:absolute; z-index:0; left:18%; top:48%; margin:0; color:#fff;
     font-family:'Quicksand', sans-serif; font-size:clamp(38px,7vw,76px); font-weight:700;
     letter-spacing:.12em; pointer-events:none; white-space:nowrap;
-    animation:pekiFall 2.8s cubic-bezier(.35,.02,.65,1) forwards;
+    animation:pekiFall 5.5s cubic-bezier(.32,.03,.62,1) forwards;
   }
   @keyframes pekiFall{
     0%{ transform:translate(-50%,-50%) scale(.7); opacity:0; }
@@ -198,7 +198,8 @@
     position:absolute; z-index:1; left:50%; bottom:18px; width:185px; height:245px;
     object-fit:cover; padding:7px 7px 22px; background:#e7e7e7;
     box-shadow:0 7px 22px rgba(0,0,0,.65); transform:translateX(-50%) translateY(105px) rotate(-2deg);
-    transition:transform 1s cubic-bezier(.2,.75,.2,1); pointer-events:none;
+    opacity:0; visibility:hidden;
+    transition:transform 1s cubic-bezier(.2,.75,.2,1), opacity .25s ease, visibility 0s .8s; pointer-events:none;
   }
   .envelope-front{
     position:absolute; z-index:3; left:0; bottom:0; width:100%; height:180px;
@@ -212,13 +213,15 @@
     transition:transform .7s ease, z-index 0s .35s;
   }
   .envelope.open .envelope-flap{ transform:rotateX(180deg); z-index:0; transition:transform .7s ease, z-index 0s .2s; }
-  .envelope.open .kiss-photo{ transform:translateX(-50%) translateY(-95px) rotate(2deg); }
+  .envelope.open .kiss-photo{
+    transform:translateX(-50%) translateY(-95px) rotate(2deg); opacity:1; visibility:visible;
+    transition:transform 1s cubic-bezier(.2,.75,.2,1), opacity .2s ease .12s, visibility 0s;
+  }
   .envelope:focus-visible{ outline:3px solid #d8dadd; outline-offset:7px; border-radius:6px; }
   .envelope-hint{ margin-top:10px; color:#aaa; font-family:'Caveat', cursive; font-size:21px; }
   .side-video{
     width:min(310px,40vw); max-height:430px; display:block; object-fit:contain;
-    border-radius:10px; background:#050505; border:1px solid #55585d;
-    box-shadow:0 18px 42px rgba(0,0,0,.7);
+    border:0; border-radius:0; background:transparent; box-shadow:none;
   }
 
   @media (max-width:600px){
@@ -335,7 +338,7 @@
       </button>
       <p class="envelope-hint">zarfı aç</p>
     </div>
-    <video class="side-video" src="video.mp4" controls playsinline preload="metadata">Tarayıcın videoyu desteklemiyor.</video>
+    <video class="side-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-label="Hareketli anı"></video>
   </div>
 </section>
 
@@ -451,8 +454,7 @@ recordAudio.addEventListener('ended', ()=>{
 });
 
 function toggleRecord(player, event){
-  const shouldPlay = recordAudio.paused;
-  if(shouldPlay){
+  if(recordAudio.paused){
     recordAudio.play().then(()=>{
       player.classList.add('is-spinning');
       player.setAttribute('aria-pressed', 'true');
@@ -461,16 +463,15 @@ function toggleRecord(player, event){
       player.setAttribute('aria-pressed', 'false');
     });
   } else {
-    recordAudio.pause();
-    player.classList.remove('is-spinning');
-    player.setAttribute('aria-pressed', 'false');
+    player.classList.add('is-spinning');
+    player.setAttribute('aria-pressed', 'true');
   }
 
   const peki = document.createElement('span');
   peki.className = 'peki-drop';
   peki.textContent = 'PEKİ';
   player.appendChild(peki);
-  setTimeout(()=>peki.remove(), 2900);
+  setTimeout(()=>peki.remove(), 5700);
 
   const rect = player.getBoundingClientRect();
   const originX = event.detail ? event.clientX : rect.left + rect.width / 2;
