@@ -263,6 +263,14 @@
     background:#060606; border-radius:12px;
   }
 
+  /* WORDLE ALTI US GALERİSİ */
+  #us-gallery{ padding-top:10px; padding-bottom:90px; }
+  .us-gallery-row{ display:flex; align-items:center; justify-content:center; gap:clamp(8px,2vw,22px); }
+  .us-gallery-row img{
+    width:min(18vw,170px); height:min(18vw,170px); object-fit:contain;
+    display:block; background:transparent;
+  }
+
   @media (max-width:600px){
     .board{ grid-template-columns:repeat(3,1fr); }
     .moments{ gap:76px; }
@@ -282,6 +290,8 @@
     .us-scene{ gap:2vw; }
     .us-side{ width:min(16vw,75px); height:min(22vw,105px); }
     .wordle-frame{ width:100%; height:760px; }
+    .us-gallery-row{ gap:6px; }
+    .us-gallery-row img{ width:21vw; height:21vw; }
   }
 
   /* FINAL / MAIN CTA */
