@@ -234,13 +234,13 @@
   .envelope:focus-visible{ outline:3px solid #d8dadd; outline-offset:7px; border-radius:6px; }
   .envelope-hint{ margin-top:10px; color:#aaa; font-family:'Caveat', cursive; font-size:21px; }
   .side-video{
-    width:min(310px,40vw); max-height:430px; display:block; object-fit:contain;
+    width:min(250px,30vw); max-height:430px; display:block; object-fit:contain;
     border:0; border-radius:0; background:transparent; box-shadow:none;
   }
   .video-column{ display:flex; flex-direction:column; align-items:center; }
-  .us-title{ margin:28px 0 8px; font-family:'Caveat', cursive; font-size:38px; color:#e5e5e5; line-height:1; }
-  .us-pair{ display:flex; align-items:center; justify-content:center; gap:16px; }
-  .us-pair img{ width:min(138px,18vw); height:138px; object-fit:contain; display:block; }
+  .us-title{ margin:0 0 14px; font-family:'Caveat', cursive; font-size:38px; color:#e5e5e5; line-height:1; }
+  .us-scene{ display:flex; align-items:center; justify-content:center; gap:12px; }
+  .us-side{ width:min(95px,11vw); height:120px; object-fit:contain; display:block; }
 
   @media (max-width:600px){
     .board{ grid-template-columns:repeat(3,1fr); }
@@ -257,8 +257,9 @@
     .envelope-back,.envelope-front{ height:160px; }
     .envelope-flap{ bottom:78px; height:82px; }
     .kiss-photo{ width:165px; height:220px; }
-    .side-video{ width:min(88vw,330px); max-height:520px; }
-    .us-pair img{ width:min(38vw,145px); height:min(38vw,145px); }
+    .side-video{ width:min(48vw,230px); max-height:520px; }
+    .us-scene{ gap:2vw; }
+    .us-side{ width:min(16vw,75px); height:min(22vw,105px); }
   }
 
   /* FINAL / MAIN CTA */
@@ -359,11 +360,11 @@
       <p class="envelope-hint">zarfı aç</p>
     </div>
     <div class="video-column">
-      <video class="side-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-label="Hareketli anı"></video>
       <h3 class="us-title">Us</h3>
-      <div class="us-pair">
-        <img src="cay.png" alt="Çay">
-        <img src="matcha.png" alt="Matcha">
+      <div class="us-scene">
+        <img class="us-side" src="matcha.png" alt="Matcha">
+        <video class="side-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-label="Hareketli anı"></video>
+        <img class="us-side" src="cay.png" alt="Çay">
       </div>
     </div>
   </div>
