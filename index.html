@@ -237,6 +237,10 @@
     width:min(310px,40vw); max-height:430px; display:block; object-fit:contain;
     border:0; border-radius:0; background:transparent; box-shadow:none;
   }
+  .video-column{ display:flex; flex-direction:column; align-items:center; }
+  .us-title{ margin:28px 0 8px; font-family:'Caveat', cursive; font-size:38px; color:#e5e5e5; line-height:1; }
+  .us-pair{ display:flex; align-items:center; justify-content:center; gap:16px; }
+  .us-pair img{ width:min(138px,18vw); height:138px; object-fit:contain; display:block; }
 
   @media (max-width:600px){
     .board{ grid-template-columns:repeat(3,1fr); }
@@ -254,6 +258,7 @@
     .envelope-flap{ bottom:78px; height:82px; }
     .kiss-photo{ width:165px; height:220px; }
     .side-video{ width:min(88vw,330px); max-height:520px; }
+    .us-pair img{ width:min(38vw,145px); height:min(38vw,145px); }
   }
 
   /* FINAL / MAIN CTA */
@@ -353,7 +358,14 @@
       </button>
       <p class="envelope-hint">zarfı aç</p>
     </div>
-    <video class="side-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-label="Hareketli anı"></video>
+    <div class="video-column">
+      <video class="side-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-label="Hareketli anı"></video>
+      <h3 class="us-title">Us</h3>
+      <div class="us-pair">
+        <img src="cay.png" alt="Çay">
+        <img src="matcha.png" alt="Matcha">
+      </div>
+    </div>
   </div>
   <audio id="envelope-audio" src="ham.mp3" preload="metadata"></audio>
 </section>
