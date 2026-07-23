@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fındık Wordle</title>
+<style>
+  :root{
+    --bg:#060606;
+    --text:#f2f2f2;
+    --empty:#33363a;
+    --key:#62656a;
+    --correct:#538d4e;
+    --present:#b59f3b;
+    --absent:#3a3a3c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; overflow:hidden; background:var(--bg); color:var(--text);
+    font-family:Arial,sans-serif; display:flex; justify-content:center; text-align:center;
+  }
+  main{width:min(100%,540px); padding:18px 12px 24px}
+  h1{margin:0; font-size:clamp(30px,8vw,46px); letter-spacing:.12em}
+  .subtitle{margin:5px 0 15px; color:#8f9297; font-size:13px}
+  #message{height:28px; margin-bottom:8px; font-weight:700}
+  #board{
+    width:min(94vw,390px); margin:0 auto 20px; display:grid;
+    grid-template-columns:repeat(6,1fr); gap:6px;
+  }
+  .tile{
+    aspect-ratio:1; display:flex; align-items:center; justify-content:center;
+    border:2px solid var(--empty); font-size:clamp(22px,7vw,34px); font-weight:800;
+    text-transform:uppercase; transition:transform .2s,border-color .2s,background .2s;
+  }
+  .tile.filled{border-color:#777b80; animation:pop .12s ease}
+  .tile.reveal{animation:flip .48s ease}
+  .tile.correct{background:var(--correct); border-color:var(--correct)}
+  .tile.present{background:var(--present); border-color:var(--present)}
+  .tile.absent{background:var(--absent); border-color:var(--absent)}
+  @keyframes pop{50%{transform:scale(1.1)}}
+  @keyframes flip{50%{transform:rotateX(90deg)}}
+  #keyboard{display:flex; flex-direction:column; gap:6px; user-select:none}
+  .key-row{display:flex; justify-content:center; gap:4px}
+  .key{
+    min-width:31px; height:46px; padding:0 7px; border:0; border-radius:5px;
+    background:var(--key); color:#fff; font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .key.wide{min-width:58px; font-size:11px}
+  .key.correct{background:var(--correct)}
+  .key.present{background:var(--present)}
+  .key.absent{background:var(--absent)}
+  .key:focus-visible{outline:2px solid #fff; outline-offset:2px}
+  @media(max-width:420px){
+    main{padding-inline:5px}
+    .key-row{gap:3px}
+    .key{min-width:0; flex:1; height:43px; padding:0 3px; font-size:12px}
+    .key.wide{flex:1.55}
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>WORDLE</h1>
+  <p class="subtitle">6 harfli kelimeyi 6 denemede bul</p>
+  <div id="message" role="status" aria-live="polite"></div>
+  <div id="board" aria-label="Wordle oyun tahtası"></div>
+  <div id="keyboard" aria-label="Ekran klavyesi"></div>
+</main>
+<script>
+  const answer = 'FINDIK';
+  const rows = 6;
+  const columns = answer.length;
+  const guesses = Array.from({length:rows},()=>[]);
+  let row = 0;
+  let finished = false;
+
+  const board = document.getElementById('board');
+  const keyboard = document.getElementById('keyboard');
+  const message = document.getElementById('message');
+  const keyRows = [
+    ['E','R','T','Y','U','I','O','P','Ğ','Ü'],
+    ['A','S','D','F','G','H','J','K','L','Ş','İ'],
+    ['ENTER','Z','C','V','B','N','M','Ö','Ç','SİL']
+  ];
+
+  for(let r=0;r<rows;r++){
+    for(let c=0;c<columns;c++){
+      const tile=document.createElement('div');
+      tile.className='tile';
+      tile.id=`tile-${r}-${c}`;
+      board.appendChild(tile);
+    }
+  }
+
+  keyRows.forEach(keys=>{
+    const keyRow=document.createElement('div');
+    keyRow.className='key-row';
+    keys.forEach(letter=>{
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='key'+(letter.length>1?' wide':'');
+      button.dataset.key=letter;
+      button.textContent=letter==='SİL'?'⌫':letter;
+      button.addEventListener('click',()=>handleKey(letter));
+      keyRow.appendChild(button);
+    });
+    keyboard.appendChild(keyRow);
+  });
+
+  function normalizeLetter(letter){
+    return letter.toLocaleUpperCase('tr-TR').replaceAll('İ','I').slice(0,1);
+  }
+
+  function handleKey(key){
+    if(finished)return;
+    if(key==='ENTER'){submitGuess();return}
+    if(key==='SİL'||key==='BACKSPACE'){
+      guesses[row].pop();
+      drawRow();
+      return;
+    }
+    if(/^[a-zA-ZçğıöşüÇĞİÖŞÜı]$/.test(key)&&guesses[row].length<columns){
+      guesses[row].push(normalizeLetter(key));
+      drawRow();
+    }
+  }
+
+  function drawRow(){
+    for(let c=0;c<columns;c++){
+      const tile=document.getElementById(`tile-${row}-${c}`);
+      tile.textContent=guesses[row][c]||'';
+      tile.classList.toggle('filled',Boolean(guesses[row][c]));
+    }
+    message.textContent='';
+  }
+
+  function scoreGuess(guess){
+    const result=Array(columns).fill('absent');
+    const remaining={};
+    for(let i=0;i<columns;i++){
+      if(guess[i]===answer[i]) result[i]='correct';
+      else remaining[answer[i]]=(remaining[answer[i]]||0)+1;
+    }
+    for(let i=0;i<columns;i++){
+      if(result[i]==='correct')continue;
+      if(remaining[guess[i]]>0){
+        result[i]='present';
+        remaining[guess[i]]--;
+      }
+    }
+    return result;
+  }
+
+  function updateKey(letter,state){
+    const key=document.querySelector(`[data-key="${letter}"]`);
+    if(!key)return;
+    const rank={absent:1,present:2,correct:3};
+    const current=['absent','present','correct'].find(name=>key.classList.contains(name));
+    if(!current||rank[state]>rank[current]){
+      key.classList.remove('absent','present','correct');
+      key.classList.add(state);
+    }
+  }
+
+  function submitGuess(){
+    if(guesses[row].length<columns){
+      message.textContent='6 harf gerekli';
+      return;
+    }
+    const guess=guesses[row].join('');
+    const result=scoreGuess(guess);
+    result.forEach((state,index)=>{
+      const tile=document.getElementById(`tile-${row}-${index}`);
+      setTimeout(()=>{
+        tile.classList.add('reveal',state);
+        updateKey(guess[index],state);
+      },index*110);
+    });
+    if(guess===answer){
+      finished=true;
+      setTimeout(()=>message.textContent='buldun 🌰',columns*110+300);
+      return;
+    }
+    if(row===rows-1){
+      finished=true;
+      setTimeout(()=>message.textContent='cevap: FINDIK',columns*110+300);
+      return;
+    }
+    row++;
+  }
+
+  window.addEventListener('keydown',event=>{
+    if(event.key==='Enter')handleKey('ENTER');
+    else if(event.key==='Backspace')handleKey('BACKSPACE');
+    else if(event.key.length===1)handleKey(event.key);
+  });
+</script>
+</body>
+</html>

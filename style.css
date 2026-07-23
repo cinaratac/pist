@@ -252,6 +252,13 @@
   .us-scene{ display:flex; align-items:center; justify-content:center; gap:12px; }
   .us-side{ width:min(95px,11vw); height:120px; object-fit:contain; display:block; }
 
+  /* WORDLE */
+  #wordle-section{ padding-top:35px; padding-bottom:85px; }
+  .wordle-frame{
+    display:block; width:min(100%,560px); height:690px; margin:0 auto; border:0;
+    background:#060606; border-radius:12px;
+  }
+
   @media (max-width:600px){
     .board{ grid-template-columns:repeat(3,1fr); }
     .moments{ gap:76px; }
@@ -270,6 +277,7 @@
     .side-video{ width:min(48vw,230px); max-height:520px; }
     .us-scene{ gap:2vw; }
     .us-side{ width:min(16vw,75px); height:min(22vw,105px); }
+    .wordle-frame{ width:100%; height:650px; }
   }
 
   /* FINAL / MAIN CTA */
