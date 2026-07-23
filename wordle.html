@@ -178,7 +178,10 @@
     });
     if(guess===answer){
       finished=true;
-      setTimeout(()=>message.textContent='buldun 🌰',columns*110+300);
+      setTimeout(()=>{
+        message.textContent='buldun 🌰';
+        window.parent.postMessage({type:'wordle-won'},'*');
+      },columns*110+300);
       return;
     }
     if(row===rows-1){

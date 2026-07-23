@@ -118,6 +118,50 @@ wordleFrame?.addEventListener('load', resizeWordleFrame);
 window.addEventListener('resize', resizeWordleFrame);
 if(wordleFrame?.contentDocument?.readyState === 'complete') resizeWordleFrame();
 
+// Wordle kazanılınca ortaya çıkan ve sayfada taşınabilen Van Gogh görseli
+function showDraggableVanGogh(){
+  let image = document.querySelector('.draggable-vangogh');
+  if(!image){
+    image = document.createElement('img');
+    image.className = 'draggable-vangogh';
+    image.src = 'vangogh.jpeg';
+    image.alt = 'Van Gogh';
+    image.draggable = false;
+    document.body.appendChild(image);
+
+    let offsetX = 0;
+    let offsetY = 0;
+    image.addEventListener('pointerdown',event=>{
+      const box = image.getBoundingClientRect();
+      offsetX = event.clientX-box.left;
+      offsetY = event.clientY-box.top;
+      image.classList.add('is-dragging');
+      image.setPointerCapture(event.pointerId);
+      event.preventDefault();
+    });
+    image.addEventListener('pointermove',event=>{
+      if(!image.hasPointerCapture(event.pointerId)) return;
+      image.style.left = (event.clientX+window.scrollX-offsetX) + 'px';
+      image.style.top = (event.clientY+window.scrollY-offsetY) + 'px';
+    });
+    const stopDragging = event=>{
+      if(image.hasPointerCapture(event.pointerId)) image.releasePointerCapture(event.pointerId);
+      image.classList.remove('is-dragging');
+    };
+    image.addEventListener('pointerup',stopDragging);
+    image.addEventListener('pointercancel',stopDragging);
+  }
+
+  const width = Math.min(window.innerWidth*.62,280);
+  image.style.left = (window.scrollX+(window.innerWidth-width)/2) + 'px';
+  image.style.top = (window.scrollY+(window.innerHeight-width*(590/736))/2) + 'px';
+}
+
+window.addEventListener('message',event=>{
+  if(event.source!==wordleFrame?.contentWindow || event.data?.type!=='wordle-won') return;
+  showDraggableVanGogh();
+});
+
 // ---- HAFIZA OYUNU (sadece burada inside joke'lar var) ----
 const jokes = ["tamam bişey demedim","ikizler işte","bakarız","pıst"];
 let deck = [...jokes, ...jokes].map((text,i)=>({id:i, text}));
