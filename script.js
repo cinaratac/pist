@@ -313,3 +313,37 @@ function loveBurst(){
     setTimeout(()=>h.remove(), 5500);
   }
 }
+
+// En alttaki yıldız her tıklamada büyür ve sonunda mektubu açar
+function growFinalStar(star){
+  if(star.dataset.complete==='true') return;
+  let step = Number(star.dataset.growStep || 0);
+  if(step===0){
+    const box = star.getBoundingClientRect();
+    star.classList.add('final-growing');
+    star.style.position = 'fixed';
+    star.style.left = box.left + 'px';
+    star.style.top = box.top + 'px';
+    star.style.width = box.width + 'px';
+    star.style.height = box.height + 'px';
+    star.style.margin = '0';
+  }
+
+  step++;
+  star.dataset.growStep = String(step);
+  const totalSteps = 6;
+  const finalScale = Math.hypot(window.innerWidth,window.innerHeight)/(star.offsetWidth*.3)*1.25;
+  const scale = Math.pow(finalScale,Math.min(step,totalSteps)/totalSteps);
+  star.style.transform = `scale(${scale})`;
+  star.setAttribute('aria-label',step<totalSteps ? 'Yıldızı daha da büyüt' : 'Mektup açılıyor');
+
+  if(step>=totalSteps){
+    star.dataset.complete = 'true';
+    setTimeout(()=>{
+      const overlay = document.getElementById('final-letter-overlay');
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      requestAnimationFrame(()=>overlay.classList.add('is-visible'));
+    },700);
+  }
+}

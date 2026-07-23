@@ -293,6 +293,29 @@
   /* FINAL / MAIN CTA */
   #final{ text-align:center; padding-bottom:150px; padding-top:60px; }
   #final .silver-star{ width:138px; height:138px; margin:0 auto 30px; }
+  #bottom-star{
+    transition:transform .62s cubic-bezier(.2,.72,.2,1),filter .3s ease;
+    transform-origin:center; will-change:transform;
+  }
+  #bottom-star.final-growing{ animation:none; z-index:1000; }
+  #final-letter-overlay{
+    position:fixed; inset:0; z-index:1100; padding:clamp(20px,6vw,70px);
+    display:flex; align-items:center; justify-content:center; overflow:auto;
+    background:rgba(5,5,5,.94); opacity:0; transition:opacity .7s ease;
+  }
+  #final-letter-overlay[hidden]{ display:none; }
+  #final-letter-overlay.is-visible{ opacity:1; }
+  .final-letter{
+    width:min(760px,100%); padding:clamp(28px,6vw,64px); color:#ededed;
+    background:linear-gradient(145deg,#151515,#080808); border:1px solid #777a7f;
+    box-shadow:0 24px 80px rgba(0,0,0,.8),0 0 35px rgba(210,214,220,.12);
+    font-family:'Caveat',cursive; text-align:left; transform:translateY(28px);
+    opacity:0; transition:transform .8s ease .2s,opacity .8s ease .2s;
+  }
+  #final-letter-overlay.is-visible .final-letter{ transform:translateY(0); opacity:1; }
+  .final-letter h2{ margin:0 0 18px; color:#fff; font-size:clamp(34px,7vw,54px); }
+  .final-letter p{ margin:0; font-size:clamp(23px,4vw,31px); line-height:1.42; }
+  .final-letter .final-signature{ margin-top:24px; color:#bfc1c5; text-align:right; }
   .heart{ position:fixed; bottom:-20px; font-size:22px; pointer-events:none; z-index:5; animation: rise linear forwards; }
   @keyframes rise{ to{ transform:translateY(-110vh) translateX(var(--drift)); opacity:0; } }
 
