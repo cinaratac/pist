@@ -156,6 +156,7 @@ function showDraggableVanGogh(){
   image.style.left = (window.scrollX+(window.innerWidth-width)/2) + 'px';
   image.style.top = (window.scrollY+(window.innerHeight-width*(590/736))/2) + 'px';
 }
+window.showDraggableVanGogh = showDraggableVanGogh;
 
 window.addEventListener('message',event=>{
   if(event.source!==wordleFrame?.contentWindow || event.data?.type!=='wordle-won') return;
@@ -239,7 +240,7 @@ function toggleEnvelope(envelope){
   envelope.setAttribute('aria-expanded', String(isOpen));
   envelope.setAttribute('aria-label', isOpen ? 'Zarfı kapat' : 'Zarfı aç');
   const hint = envelope.parentElement.querySelector('.envelope-hint');
-  hint.textContent = isOpen ? 'bir daha basarsan kapanır' : 'zarfı aç';
+  hint.textContent = isOpen ? 'hamham' : 'zarfı aç';
   if(isOpen){
     const envelopeAudio = document.getElementById('envelope-audio');
     envelopeAudio.currentTime = 0;

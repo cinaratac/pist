@@ -15,8 +15,9 @@
     --absent:#3a3a3c;
   }
   *{box-sizing:border-box}
+  html{background:transparent}
   body{
-    margin:0; min-height:0; overflow:visible; background:var(--bg); color:var(--text);
+    margin:0; min-height:0; overflow:visible; background:transparent; color:var(--text);
     font-family:Arial,sans-serif; display:flex; justify-content:center; text-align:center;
   }
   main{width:min(100%,540px); margin:0 auto; padding:18px 12px 30px}
@@ -180,7 +181,15 @@
       finished=true;
       setTimeout(()=>{
         message.textContent='buldun 🌰';
-        window.parent.postMessage({type:'wordle-won'},'*');
+        try{
+          if(typeof window.parent.showDraggableVanGogh==='function'){
+            window.parent.showDraggableVanGogh();
+          }else{
+            window.parent.postMessage({type:'wordle-won'},'*');
+          }
+        }catch(error){
+          window.parent.postMessage({type:'wordle-won'},'*');
+        }
       },columns*110+300);
       return;
     }
