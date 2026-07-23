@@ -13,10 +13,9 @@ for(let i=0;i<80;i++){
 
 // Sayfanın her yerinde rastgele kayan yıldızlar
 const shootingStarsEl = document.getElementById('shooting-stars');
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 function createShootingStar(topOnly=false){
-  if(reducedMotion.matches || !shootingStarsEl) return;
+  if(!shootingStarsEl) return;
   const star = document.createElement('span');
   const goesRight = Math.random() > .28;
   const top = topOnly || Math.random() < .62
@@ -26,10 +25,10 @@ function createShootingStar(topOnly=false){
   star.className = 'shooting-star';
   star.style.left = (goesRight ? -18+Math.random()*78 : 42+Math.random()*72) + 'vw';
   star.style.top = top + 'vh';
-  star.style.setProperty('--tail-length', (65+Math.random()*105) + 'px');
+  star.style.setProperty('--tail-length', (95+Math.random()*145) + 'px');
   star.style.setProperty('--shoot-angle', (goesRight ? 12+Math.random()*24 : 144+Math.random()*24) + 'deg');
   star.style.setProperty('--shoot-distance', (55+Math.random()*70) + 'vw');
-  const duration = 1.15+Math.random()*1.25;
+  const duration = .9+Math.random()*.9;
   star.style.setProperty('--shoot-time', duration + 's');
   shootingStarsEl.appendChild(star);
   setTimeout(()=>star.remove(), duration*1000+150);
@@ -37,14 +36,11 @@ function createShootingStar(topOnly=false){
 
 function scheduleShootingStar(){
   createShootingStar();
-  setTimeout(scheduleShootingStar, 380+Math.random()*900);
+  setTimeout(scheduleShootingStar, 180+Math.random()*420);
 }
 
-window.addEventListener('load', ()=>{
-  if(reducedMotion.matches) return;
-  for(let i=0;i<7;i++) setTimeout(()=>createShootingStar(true), i*210);
-  scheduleShootingStar();
-});
+for(let i=0;i<12;i++) setTimeout(()=>createShootingStar(i<8), i*120);
+scheduleShootingStar();
 
 // Kenar yıldızları (sayfa boyunca sağda ve solda)
 function scatterSideStars(){
@@ -103,6 +99,24 @@ window.addEventListener('load', drawStarChain);
 window.addEventListener('resize', drawStarChain);
 document.querySelector('.side-video')?.addEventListener('loadedmetadata', drawStarChain);
 document.fonts?.ready.then(drawStarChain);
+
+// Wordle iframe'ini içeriğinin tamamı görünecek şekilde boyutlandır
+const wordleFrame = document.querySelector('.wordle-frame');
+function resizeWordleFrame(){
+  if(!wordleFrame?.contentDocument) return;
+  const wordleDocument = wordleFrame.contentDocument;
+  const height = Math.max(
+    wordleDocument.body?.scrollHeight || 0,
+    wordleDocument.documentElement?.scrollHeight || 0
+  );
+  if(height){
+    wordleFrame.style.height = (height+8) + 'px';
+    requestAnimationFrame(drawStarChain);
+  }
+}
+wordleFrame?.addEventListener('load', resizeWordleFrame);
+window.addEventListener('resize', resizeWordleFrame);
+if(wordleFrame?.contentDocument?.readyState === 'complete') resizeWordleFrame();
 
 // ---- HAFIZA OYUNU (sadece burada inside joke'lar var) ----
 const jokes = ["tamam bişey demedim","ikizler işte","bakarız","pıst"];
