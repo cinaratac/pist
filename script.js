@@ -11,6 +11,41 @@ for(let i=0;i<80;i++){
   starsEl.appendChild(s);
 }
 
+// Sayfanın her yerinde rastgele kayan yıldızlar
+const shootingStarsEl = document.getElementById('shooting-stars');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function createShootingStar(topOnly=false){
+  if(reducedMotion.matches || !shootingStarsEl) return;
+  const star = document.createElement('span');
+  const goesRight = Math.random() > .28;
+  const top = topOnly || Math.random() < .62
+    ? Math.random()*32
+    : 8 + Math.random()*78;
+
+  star.className = 'shooting-star';
+  star.style.left = (goesRight ? -18+Math.random()*78 : 42+Math.random()*72) + 'vw';
+  star.style.top = top + 'vh';
+  star.style.setProperty('--tail-length', (65+Math.random()*105) + 'px');
+  star.style.setProperty('--shoot-angle', (goesRight ? 12+Math.random()*24 : 144+Math.random()*24) + 'deg');
+  star.style.setProperty('--shoot-distance', (55+Math.random()*70) + 'vw');
+  const duration = 1.15+Math.random()*1.25;
+  star.style.setProperty('--shoot-time', duration + 's');
+  shootingStarsEl.appendChild(star);
+  setTimeout(()=>star.remove(), duration*1000+150);
+}
+
+function scheduleShootingStar(){
+  createShootingStar();
+  setTimeout(scheduleShootingStar, 380+Math.random()*900);
+}
+
+window.addEventListener('load', ()=>{
+  if(reducedMotion.matches) return;
+  for(let i=0;i<7;i++) setTimeout(()=>createShootingStar(true), i*210);
+  scheduleShootingStar();
+});
+
 // Kenar yıldızları (sayfa boyunca sağda ve solda)
 function scatterSideStars(){
   const el = document.getElementById('side-stars');
